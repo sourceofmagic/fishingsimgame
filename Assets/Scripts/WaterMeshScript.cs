@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using System;
+
 
 [RequireComponent (typeof(MeshFilter))]
 public class WaterMeshScript : MonoBehaviour 
@@ -10,31 +8,113 @@ public class WaterMeshScript : MonoBehaviour
     #region setup
 
     Mesh mesh;
-
+    MeshFilter meshFilter;
+    MeshCollider meshCollider;
     Vector3[] vertices;
     int[] triangles;
+    Vector2[] uvs;
 
-    public ushort n = 20; // разбиение нашей сеточки
+    public ushort n = 55; // разбиение нашей сеточки
 
     void Start()
     {
         mesh = new Mesh();
+        mesh.name = "MyWaterMesh";
         GetComponent<MeshFilter> ().mesh = mesh;
 
         CreateShape();
+
+        meshFilter = GetComponent<MeshFilter> ();
+        meshFilter.mesh = mesh;
+        meshCollider = GetComponent<MeshCollider> ();
+        meshCollider.sharedMesh = null;
+        meshCollider.sharedMesh = mesh;
     }
     #endregion
 
     void CreateShape()
     {
-        vertices = createPoints().ToArray();
+        /*vertices = createPoints().ToArray();
         triangles = createTriangles().ToArray();
         mesh.Clear();
         mesh.vertices = vertices;
+        mesh.triangles = triangles;*/
+
+        // новое ==================================
+
+        int width = 2 * n;
+        int totalVerts = width * width;
+        vertices = new Vector3[totalVerts];
+        uvs = new Vector2[totalVerts];
+
+        // заполняем вершины и uv
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < width; z++)
+            {
+                int idx = x * width + z;
+                vertices[idx] = new Vector3(x, 0f, z);
+                uvs[idx] = new Vector2((float)x / (width - 1), (float)z / (width - 1));
+            }
+        }
+
+        // кол-во центров и треугов
+        int centersPerRow = (width - 1) / 2; // кол-во центров по одному направлению (i=1,3,...,width-2)
+        int centersTotal = centersPerRow * centersPerRow;
+        int trisPerCenter = 8;               // по 8 треугольников вокруг центра
+        int indicesCount = centersTotal * trisPerCenter * 3;
+
+        List<int> triList = new List<int>(indicesCount);
+
+        // 3) Пробегаем центры: i и j — координаты центра (не индекс массива)
+        // центры на нечетных координатах: 1,3,5,...,width-2
+        for (int i = 1; i < width - 1; i += 2)    // i = x
+        {
+            for (int j = 1; j < width - 1; j += 2) // j = z
+            {
+                // индекс центра в массиве вершин
+                int c = i * width + j;
+
+                // соседние индексы (вокруг центра)
+                int a = i * width + (j - 1);       // (i, j-1)
+                int b = (i - 1) * width + (j - 1); // (i-1, j-1)
+                int d = (i - 1) * width + j;       // (i-1, j)
+                int e = (i - 1) * width + (j + 1); // (i-1, j+1)
+                int f = i * width + (j + 1);       // (i, j+1)
+                int g = (i + 1) * width + (j + 1); // (i+1, j+1)
+                int h = (i + 1) * width + j;       // (i+1, j)
+                int k = (i + 1) * width + (j - 1); // (i+1, j-1)
+
+                // добавляем 8 треугольников вокруг центра
+                triList.Add(c); triList.Add(a); triList.Add(b);
+                triList.Add(c); triList.Add(b); triList.Add(d);
+                triList.Add(c); triList.Add(d); triList.Add(e);
+                triList.Add(c); triList.Add(e); triList.Add(f);
+                triList.Add(c); triList.Add(f); triList.Add(g);
+                triList.Add(c); triList.Add(g); triList.Add(h);
+                triList.Add(c); triList.Add(h); triList.Add(k);
+                triList.Add(c); triList.Add(k); triList.Add(a);
+            }
+        }
+
+        triangles = triList.ToArray();
+
+        // 4) Присваиваем мешу
+        mesh.Clear();
+        mesh.vertices = vertices;
+        mesh.uv = uvs;
         mesh.triangles = triangles;
+
+        // 5) Нормали/границы/тангенсы
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+
+        // кон =======================================
     }
 
-    List<int> createTriangles()
+/*    List<int> createTriangles()
     {
         List<Vector3> vert = createPoints();
         List<int> trian = new List<int>();
@@ -99,5 +179,5 @@ public class WaterMeshScript : MonoBehaviour
             }
         }
         return v;
-    }
+    }*/
 }
