@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Special
   m_EditorClassIdentifier: Assembly-CSharp::FishData
   fishName: "\u041E\u0441\u043E\u0431\u0430\u044F \u0440\u044B\u0431\u0430"
-  inventoryItem: {fileID: 0}
+  inventoryItem: {fileID: 21300000, guid: 3be841c21a3f4bd459b4595d7d5451d1, type: 3}
   probability: 5

@@ -1,12 +1,13 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 
 public class FishingRodController : MonoBehaviour
 {
     public bool isWater;
-    public bool isCasted;
-    public bool isPulling;
+    public bool isCasted; // заброшена
+    public bool isPulling; // выт€гиваетс€
 
     Animator animator;
     public GameObject bait;
@@ -15,11 +16,13 @@ public class FishingRodController : MonoBehaviour
     public GameObject ropeEnd;
     public LineRenderer Rope;
 
+
     Transform baitPosition;
     GameObject instantiatedBait;
     void Start()
     {
         animator = GetComponent<Animator>();
+        FishingMiniGame.OnFishingEnd += ReturnRod;
     }
 
     private void Update()
@@ -55,15 +58,9 @@ public class FishingRodController : MonoBehaviour
                     ropeEnd.transform.position = baitPosition.position;
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) && !isPulling)
             {
-                animator.SetTrigger(isCasted == true ? "Cancel" : "Cancel2");
-
-
-                Rope.enabled = false;
-                isCasted = false;
-                isPulling = false;
-                Destroy(instantiatedBait);
+                ReturnRod();
             }
         }
 
@@ -96,5 +93,16 @@ public class FishingRodController : MonoBehaviour
         isPulling = true;
 
         FishingMiniGame.Instance.setHasPulled();
+    }
+
+    public void ReturnRod()
+    {
+        animator.SetTrigger(isCasted == true ? "Cancel" : "Cancel2");
+
+
+        Rope.enabled = false;
+        isCasted = false;
+        isPulling = false;
+        Destroy(instantiatedBait);
     }
 }

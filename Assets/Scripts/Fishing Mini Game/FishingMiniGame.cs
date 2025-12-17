@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class FishingMiniGame : MonoBehaviour
 {
@@ -10,6 +11,12 @@ public class FishingMiniGame : MonoBehaviour
 
     public bool isThereABite;
     public bool hasPulled;
+
+    public static event Action OnFishingEnd;
+
+    public GameObject minigame;
+
+    private FishData fishBiting;
 
     private void Awake()
     {
@@ -25,6 +32,8 @@ public class FishingMiniGame : MonoBehaviour
 
     internal void StartFishing()
     {
+        SwitchControl.Instance.toFishing();
+
         StartCoroutine(FishingCoroutine());
     }
 
@@ -33,11 +42,14 @@ public class FishingMiniGame : MonoBehaviour
         yield return new WaitForSeconds(4f);
 
         FishData fish = CalculateBite();
+        fishBiting = fish;
 
         if (fish.fishName == "Ничего")
         {
             Debug.LogWarning("Вы поймали что-то склизкое и мерзкое, это точно не рыба");
+            FishingResult.Instance.ResultInfo(fish);
             EndFishing();
+            
 
         }
         else
@@ -58,6 +70,15 @@ public class FishingMiniGame : MonoBehaviour
             yield return null;
         }
         Debug.LogWarning("Мини-игра!");
+        fishBiting = fish;
+        StartMiniGame();
+    }
+
+    private void StartMiniGame()
+    {
+        minigame.gameObject.SetActive(true);
+        minigame.GetComponent<MiniGameRealization>().enabled = true;
+
     }
 
     public void setHasPulled()
@@ -67,8 +88,12 @@ public class FishingMiniGame : MonoBehaviour
 
     private void EndFishing()
     {
+        SwitchControl.Instance.toPlayer();
         isThereABite = false;
         hasPulled = false;
+        fishBiting = null;
+
+        OnFishingEnd?.Invoke();
     }
 
     private FishData CalculateBite()
@@ -94,5 +119,26 @@ public class FishingMiniGame : MonoBehaviour
             }
         }
         return null;
+    }
+
+    internal void EndMiniGame(bool success)
+    {
+        minigame.gameObject.SetActive(false);
+        //minigameScript.enabled = false;
+        minigame.GetComponent<MiniGameRealization>().enabled = false;
+
+        if (success)
+        {
+            Debug.Log("Рыбка поймана");
+            //InventorySystem.Instance.AddToInventory(fishBiting.fishName);
+            FishingResult.Instance.ResultInfo(fishBiting);
+            EndFishing();
+            
+        }
+        else
+        {
+            Debug.Log("Рыбка ускользнула");
+            EndFishing();
+        }
     }
 }
