@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using TMPro;
 
 public class FishingMiniGame : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class FishingMiniGame : MonoBehaviour
     public GameObject minigame;
 
     private FishData fishBiting;
+
+    public GameObject textBox;
 
     private void Awake()
     {
@@ -55,6 +58,7 @@ public class FishingMiniGame : MonoBehaviour
         else
         {
             Debug.LogWarning(fish.fishName + " на крючке!");
+            textBox.GetComponent<TextMeshProUGUI>().text = fish.fishName + " на крючке!\nНажмите ПКМ чтобы ловить!";
             StartCoroutine(StartFishStruggle(fish));
         }
     }
@@ -78,6 +82,7 @@ public class FishingMiniGame : MonoBehaviour
     {
         minigame.gameObject.SetActive(true);
         minigame.GetComponent<MiniGameRealization>().enabled = true;
+        textBox.GetComponent<TextMeshProUGUI>().text = "Нажимайте кнопки Ф и В чтобы двигать курсором за рыбой.";
 
     }
 
@@ -133,6 +138,7 @@ public class FishingMiniGame : MonoBehaviour
             //InventorySystem.Instance.AddToInventory(fishBiting.fishName);
             FishingResult.Instance.ResultInfo(fishBiting);
             EndFishing();
+            SwitchControl.Instance.fishCountIncrease();
             
         }
         else

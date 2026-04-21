@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,8 +22,16 @@ public class SwitchControl : MonoBehaviour
     // ÓÄÎ×ÊÀ
     public GameObject fishingRod;
 
-    public enum ControlMode { Player, Ship, Fishing}
+    // UI
+
+    public GameObject textBox;
+
+
+    // ÑÎÑÒÎ‗ÍÈ‗
+    public enum ControlMode { Player, Ship, Fishing};
     public ControlMode currentMode;
+
+    private int fishCount = 0; 
 
     private void Awake()
     {
@@ -36,6 +45,7 @@ public class SwitchControl : MonoBehaviour
         }
         currentMode = ControlMode.Player;
         toPlayer();
+        textBox.GetComponent<TextMeshProUGUI>().text = "Ðûב ןמילאםמ: " + fishCount + "\n×עמבû םאקאעü כמגטעü נûבף, םאזלטעו ËÊÌ ןמ גמהו!";
     }
 
     void Update()
@@ -51,8 +61,9 @@ public class SwitchControl : MonoBehaviour
                     break;
 
             }
+
     }
-        
+
 
     void SetMode(ControlMode mode)
     {
@@ -103,5 +114,11 @@ public class SwitchControl : MonoBehaviour
         player.GetComponent<Rigidbody>().isKinematic = true;
         playerInput.enabled = false;
         characterController.enabled = false;
+    }
+
+    public void fishCountIncrease()
+    {
+        fishCount++;
+        textBox.GetComponent<TextMeshProUGUI>().text = "Ðûב ןמילאםמ: " + fishCount;
     }
 }
