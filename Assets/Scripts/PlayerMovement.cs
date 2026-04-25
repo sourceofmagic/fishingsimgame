@@ -11,12 +11,6 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 move;
     public float charSpeed;
 
-
-    void Start()
-    {
-        Cursor.visible = false;
-    }
-
     private void OnMove(InputValue val)
     {
         move = val.Get<Vector2>();

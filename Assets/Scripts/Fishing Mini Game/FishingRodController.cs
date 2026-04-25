@@ -17,12 +17,21 @@ public class FishingRodController : MonoBehaviour
     public LineRenderer Rope;
 
 
+    public bool isAnimatorNull;
+
+
     Transform baitPosition;
     GameObject instantiatedBait;
-    void Start()
+
+    private void Awake()
     {
         animator = GetComponent<Animator>();
         FishingMiniGame.OnFishingEnd += ReturnRod;
+    }
+
+    private void OnDestroy()
+    {
+        FishingMiniGame.OnFishingEnd -= ReturnRod;
     }
 
     private void Update()
@@ -74,6 +83,7 @@ public class FishingRodController : MonoBehaviour
     IEnumerator CastRod(Vector3 targetPosition)
     {
         isCasted = true;
+
         animator.SetTrigger("Cast");
         yield return new WaitForSeconds(1f);
 
@@ -88,7 +98,9 @@ public class FishingRodController : MonoBehaviour
 
     private void PullRod()
     {
+
         animator.SetTrigger("Pull");
+
         isCasted = false;
         isPulling = true;
 
@@ -97,12 +109,11 @@ public class FishingRodController : MonoBehaviour
 
     public void ReturnRod()
     {
-        animator.SetTrigger(isCasted == true ? "Cancel" : "Cancel2");
-
-
         Rope.enabled = false;
         isCasted = false;
         isPulling = false;
         Destroy(instantiatedBait);
+
+        animator.SetTrigger(isCasted == true ? "Cancel" : "Cancel2");
     }
 }

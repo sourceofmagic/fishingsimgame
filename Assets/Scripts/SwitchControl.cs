@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class SwitchControl : MonoBehaviour
 {
 
-    public static SwitchControl Instance { get; set; }
+    public static SwitchControl Instance { get; private set; }
 
 
     //  Œ–¿¡À‹
@@ -23,7 +23,6 @@ public class SwitchControl : MonoBehaviour
     public GameObject fishingRod;
 
     // UI
-
     public GameObject textBox;
 
 

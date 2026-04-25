@@ -6,7 +6,7 @@ public class RodeScript : MonoBehaviour
     public GameObject endRope;
     LineRenderer lr;
 
-    void Start()
+    void Awake()
     {
         lr = GetComponent<LineRenderer>();
         lr.positionCount = 2;

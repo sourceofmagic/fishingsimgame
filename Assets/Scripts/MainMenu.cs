@@ -1,4 +1,3 @@
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,12 +21,14 @@ public class MainMenu : MonoBehaviour
         pauseMenu.SetActive(true);
         Time.timeScale = 0f;
         isPause = true;
+        Cursor.visible = true;
     }
     
     public void ToMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
         Cursor.visible = true;
+        Time.timeScale = 1f;
     }
 
     public void ReturnTOGame()
@@ -43,6 +44,7 @@ public class MainMenu : MonoBehaviour
 
     public void ExitGame()
     {
+        Time.timeScale = 1f;
         Application.Quit();
     }
 }
