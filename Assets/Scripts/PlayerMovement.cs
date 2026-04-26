@@ -11,15 +11,46 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 move;
     public float charSpeed;
 
-    private void OnMove(InputValue val)
+    private InputManager inputManager;
+
+    private void Awake()
     {
-        move = val.Get<Vector2>();
+        inputManager = InputManager.Instance;
+        if (CharacterController == null)
+            CharacterController = GetComponent<CharacterController>();
+    }
+
+    private void OnEnable()
+    {
+        if (inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.Move.performed += OnMovePerformed;
+            inputManager.actions.Player.Move.canceled += OnMoveCanceled;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.Move.performed -= OnMovePerformed;
+            inputManager.actions.Player.Move.canceled -= OnMoveCanceled;
+        }
+    }
+
+    private void OnMovePerformed(InputAction.CallbackContext ctx)
+    {
+        move = ctx.ReadValue<Vector2>();
+    }
+
+    private void OnMoveCanceled(InputAction.CallbackContext ctx)
+    {
+        move = Vector2.zero;
     }
 
     void FixedUpdate()
     {
         CharacterController.Move((GetForward() * move.y + GetRight() * move.x) * Time.deltaTime * charSpeed);
-
     }
   
 

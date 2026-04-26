@@ -2,6 +2,7 @@ using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class SwitchControl : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class SwitchControl : MonoBehaviour
     // ИГРОК
     public PlayerMovement player;
     public CinemachineCamera playerCamera;
-    public PlayerInput playerInput;
     public CharacterController characterController;
 
     // УДОЧКА
@@ -24,100 +24,111 @@ public class SwitchControl : MonoBehaviour
 
     // UI
     public GameObject textBox;
+    
 
-
-    // СОСТОЯНИЯ
-    public enum ControlMode { Player, Ship, Fishing};
-    public ControlMode currentMode;
-
-    private int fishCount = 0; 
+    private InputManager inputManager;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
         else
         {
             Instance = this;
         }
-        currentMode = ControlMode.Player;
-        toPlayer();
-        textBox.GetComponent<TextMeshProUGUI>().text = "Рыб поймано: " + fishCount + "\nЧтобы начать ловить рыбу, нажмите ЛКМ по воде!";
+        inputManager = InputManager.Instance;
+        setFishCountText();
+        inputManager.ChangeInputMap(InputManager.InputType.Player);
     }
 
-    void Update()
+    private void OnEnable()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
-            switch (currentMode)
-            {
-                case (ControlMode.Player):
-                    toShip();
-                    break;
-                case (ControlMode.Ship):
-                    toPlayer();
-                    break;
-
-            }
-
+        if(inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.SwitchToShip.performed += OnSwitchToShip;
+            inputManager.actions.Player.CastAFishingRod.performed += OnSwitchToFishing;
+        }
+        if (inputManager?.actions?.Ship != null)
+        {
+            inputManager.actions.Ship.SwitchToPlayer.performed += OnSwitchToPlayer;
+        }
+        FishingMiniGame.OnFishingEnd += SwitchToPlayer;
     }
 
-
-    void SetMode(ControlMode mode)
+    private void OnDisable()
     {
-        currentMode = mode;
-
-        if (player != null)
-            player.enabled = (mode == ControlMode.Player);
-        if(ship != null) 
-            ship.enabled = (mode == ControlMode.Ship);
+        if (inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.SwitchToShip.performed -= OnSwitchToShip;
+            inputManager.actions.Player.CastAFishingRod.performed -= OnSwitchToFishing;
+        }
+        if (inputManager?.actions?.Ship != null)
+        {
+            inputManager.actions.Ship.SwitchToPlayer.performed -= OnSwitchToPlayer;
+        }
+        FishingMiniGame.OnFishingEnd -= SwitchToPlayer;
     }
 
-    public void toPlayer()
+    public void OnSwitchToPlayer(InputAction.CallbackContext ctx)
     {
-        SetMode(ControlMode.Player);
+        SwitchToPlayer();
+    }
+
+    public void SwitchToPlayer()
+    {
         Debug.Log("Контроль игрока");
+        inputManager.ChangeInputMap(InputManager.InputType.Player);
 
         playerCamera.Priority = 2;
         shipCamera.Priority = 0;
 
 
-        player.GetComponent<Rigidbody>().isKinematic = false;
-        playerInput.enabled = true;
+        player.enabled = true;
+        ship.enabled = false;
+
         characterController.enabled = true;
 
-
+        fishingRod.SetActive(true);
         fishingRod.GetComponent<FishingRodController>().enabled = true;
+        setFishCountText();
     }
 
-    public void toShip()
+    public void OnSwitchToShip(InputAction.CallbackContext ctx)
     {
-        SetMode(ControlMode.Ship);
+        SwitchToShip();
+    }
+    public void SwitchToShip()
+    {
         Debug.Log("Контроль корабля");
+        inputManager.ChangeInputMap(InputManager.InputType.Ship);
 
         shipCamera.Priority = 2;
         playerCamera.Priority = 0;
 
+        player.enabled = false;
+        ship.enabled = true;
 
-        player.GetComponent<Rigidbody>().isKinematic = true;
-        playerInput.enabled = false;
         characterController.enabled = false;
 
         fishingRod.GetComponent<FishingRodController>().enabled = false;
+        fishingRod.SetActive(false);
     }
 
-    public void toFishing()
+    public void OnSwitchToFishing(InputAction.CallbackContext ctx)
     {
-        SetMode(ControlMode.Fishing);
-        player.GetComponent<Rigidbody>().isKinematic = true;
-        playerInput.enabled = false;
-        characterController.enabled = false;
+        if(FishingRodController.Instance.isCasted) SwitchToFishing();
+    }
+    public void SwitchToFishing()
+    {
+        inputManager.ChangeInputMap(InputManager.InputType.Fishing);
+        player.enabled = false;
     }
 
-    public void fishCountIncrease()
+    public void setFishCountText()
     {
-        fishCount++;
-        textBox.GetComponent<TextMeshProUGUI>().text = "Рыб поймано: " + fishCount;
+        textBox.GetComponent<TextMeshProUGUI>().text = "Рыб поймано: " + GameManager.Instance.getCurrentFishAmount();
     }
 }

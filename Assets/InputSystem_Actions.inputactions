@@ -662,7 +662,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Cancel Fishing",
+                    "name": "Abort",
                     "type": "Button",
                     "id": "c9795644-1798-4311-98da-057197b297cf",
                     "expectedControlType": "",
@@ -745,7 +745,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Cancel Fishing",
+                    "action": "Abort",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

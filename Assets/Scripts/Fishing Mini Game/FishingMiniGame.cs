@@ -8,7 +8,7 @@ public class FishingMiniGame : MonoBehaviour
 {
     public static FishingMiniGame Instance { get; set; }
 
-    public List<FishData> fishList; // список возможных рыбов
+    //public List<FishData> fishList; // список возможных рыбов
 
     public bool isThereABite;
     public bool hasPulled;
@@ -21,6 +21,8 @@ public class FishingMiniGame : MonoBehaviour
 
     public GameObject textBox;
 
+    private InputManager inputManager;
+
     private void Awake()
     {
         if(Instance != null && Instance != this)
@@ -31,12 +33,13 @@ public class FishingMiniGame : MonoBehaviour
         {
             Instance = this;
         }
+        inputManager = InputManager.Instance;
+
     }
 
     internal void StartFishing()
     {
-        SwitchControl.Instance.toFishing();
-
+        inputManager.ChangeInputMap(InputManager.InputType.Fishing);
         StartCoroutine(FishingCoroutine());
     }
 
@@ -73,6 +76,8 @@ public class FishingMiniGame : MonoBehaviour
         {
             yield return null;
         }
+
+
         Debug.LogWarning("Мини-игра!");
         fishBiting = fish;
         StartMiniGame();
@@ -93,10 +98,10 @@ public class FishingMiniGame : MonoBehaviour
 
     private void EndFishing()
     {
-        SwitchControl.Instance.toPlayer();
+        inputManager.ChangeInputMap(InputManager.InputType.Player);
         isThereABite = false;
         hasPulled = false;
-        fishBiting = null;
+        //fishBiting = null;
 
         OnFishingEnd?.Invoke();
     }
@@ -105,7 +110,7 @@ public class FishingMiniGame : MonoBehaviour
     {
         // Расчитываем общую вероятность
         float totalProbability = 0f;
-        foreach(FishData fish in fishList)
+        foreach(FishData fish in GameManager.Instance.fishList)
         {
             totalProbability += fish.probability;
         }
@@ -115,7 +120,7 @@ public class FishingMiniGame : MonoBehaviour
         Debug.Log("Рандом число: " + randomValue);
 
         float cumulativeProbability = 0f;
-        foreach (FishData fish in fishList)
+        foreach (FishData fish in GameManager.Instance.fishList)
         {
             cumulativeProbability += fish.probability;
             if(randomValue <= cumulativeProbability)
@@ -134,17 +139,14 @@ public class FishingMiniGame : MonoBehaviour
 
         if (success)
         {
-            Debug.Log("Рыбка поймана");
-            //InventorySystem.Instance.AddToInventory(fishBiting.fishName);
+            Debug.Log("Рыбка поймана\nВ fishBiting = " + fishBiting.fishName);
+            GameManager.Instance.CaughtFish(fishBiting);
             FishingResult.Instance.ResultInfo(fishBiting);
-            EndFishing();
-            SwitchControl.Instance.fishCountIncrease();
-            
         }
         else
         {
             Debug.Log("Рыбка ускользнула");
-            EndFishing();
         }
+        EndFishing();
     }
 }

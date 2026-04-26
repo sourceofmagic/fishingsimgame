@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class FishCursorMovement : MonoBehaviour
 {
@@ -6,10 +7,47 @@ public class FishCursorMovement : MonoBehaviour
     private const float maxLeft = -353f;
     private const float maxRight = 353f;
 
-    private float moveSpeed = 500f;
+    [SerializeField] private float moveSpeed = 500f;
+
+    [SerializeField] private Vector2 move;
+    private InputManager inputManager;
+
+    private void Awake()
+    {
+        inputManager = InputManager.Instance;
+    }
+
+    private void OnEnable()
+    {
+        if (inputManager?.actions?.Fishing != null)
+        {
+            inputManager.actions.Fishing.Move.performed += OnMovePerformed;
+            inputManager.actions.Fishing.Move.canceled += OnMoveCanceled;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputManager?.actions?.Fishing != null)
+        {
+            inputManager.actions.Fishing.Move.performed -= OnMovePerformed;
+            inputManager.actions.Fishing.Move.canceled -= OnMoveCanceled;
+        }
+    }
+
+    private void OnMovePerformed(InputAction.CallbackContext ctx)
+    {
+        move = ctx.ReadValue<Vector2>();
+    }
+
+    private void OnMoveCanceled(InputAction.CallbackContext ctx)
+    {
+        move = Vector2.zero;
+    }
+
     void Update()
     {
-        float moveInput = Input.GetAxis("Horizontal");
+        float moveInput = move.x;
 
         if(moveInput != 0)
         {

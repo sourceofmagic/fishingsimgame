@@ -748,7 +748,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Cancel Fishing"",
+                    ""name"": ""Abort"",
                     ""type"": ""Button"",
                     ""id"": ""c9795644-1798-4311-98da-057197b297cf"",
                     ""expectedControlType"": """",
@@ -831,7 +831,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Cancel Fishing"",
+                    ""action"": ""Abort"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -918,7 +918,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Fishing = asset.FindActionMap("Fishing", throwIfNotFound: true);
         m_Fishing_Pull = m_Fishing.FindAction("Pull", throwIfNotFound: true);
         m_Fishing_Move = m_Fishing.FindAction("Move", throwIfNotFound: true);
-        m_Fishing_CancelFishing = m_Fishing.FindAction("Cancel Fishing", throwIfNotFound: true);
+        m_Fishing_Abort = m_Fishing.FindAction("Abort", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1336,7 +1336,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IFishingActions> m_FishingActionsCallbackInterfaces = new List<IFishingActions>();
     private readonly InputAction m_Fishing_Pull;
     private readonly InputAction m_Fishing_Move;
-    private readonly InputAction m_Fishing_CancelFishing;
+    private readonly InputAction m_Fishing_Abort;
     /// <summary>
     /// Provides access to input actions defined in input action map "Fishing".
     /// </summary>
@@ -1357,9 +1357,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Move => m_Wrapper.m_Fishing_Move;
         /// <summary>
-        /// Provides access to the underlying input action "Fishing/CancelFishing".
+        /// Provides access to the underlying input action "Fishing/Abort".
         /// </summary>
-        public InputAction @CancelFishing => m_Wrapper.m_Fishing_CancelFishing;
+        public InputAction @Abort => m_Wrapper.m_Fishing_Abort;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1392,9 +1392,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
-            @CancelFishing.started += instance.OnCancelFishing;
-            @CancelFishing.performed += instance.OnCancelFishing;
-            @CancelFishing.canceled += instance.OnCancelFishing;
+            @Abort.started += instance.OnAbort;
+            @Abort.performed += instance.OnAbort;
+            @Abort.canceled += instance.OnAbort;
         }
 
         /// <summary>
@@ -1412,9 +1412,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
-            @CancelFishing.started -= instance.OnCancelFishing;
-            @CancelFishing.performed -= instance.OnCancelFishing;
-            @CancelFishing.canceled -= instance.OnCancelFishing;
+            @Abort.started -= instance.OnAbort;
+            @Abort.performed -= instance.OnAbort;
+            @Abort.canceled -= instance.OnAbort;
         }
 
         /// <summary>
@@ -1608,11 +1608,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMove(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Cancel Fishing" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Abort" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnCancelFishing(InputAction.CallbackContext context);
+        void OnAbort(InputAction.CallbackContext context);
     }
 }

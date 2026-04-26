@@ -7,6 +7,8 @@ public class InputManager : MonoBehaviour
     public InputSystem_Actions actions;
 
     public enum InputType { Player, Ship, Fishing, UI };
+    public InputType currentMap;
+    public InputType lastMap;
 
     // грузим этот скрипт самым первым при инициализации
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -34,10 +36,16 @@ public class InputManager : MonoBehaviour
         actions.Enable();
 
         ChangeInputMap(InputType.Player);
+        currentMap = InputType.Player;
     }
 
     public void ChangeInputMap(InputType inputType)
     {
+        if(currentMap == inputType) return;
+
+        lastMap = currentMap;
+        currentMap = inputType;
+
         switch(inputType)
         {
             case InputType.Player:
@@ -49,6 +57,7 @@ public class InputManager : MonoBehaviour
                 break;
             case InputType.Ship:
                 actions.Ship.Enable();
+                actions.UI.Enable();
 
                 actions.Player.Disable();
                 break;
@@ -62,7 +71,7 @@ public class InputManager : MonoBehaviour
                 actions.UI.Enable();
                 
                 actions.Player.Disable();
-                actions.Ship.Disable();              
+                actions.Ship.Disable();           
                 break;
         }
     }

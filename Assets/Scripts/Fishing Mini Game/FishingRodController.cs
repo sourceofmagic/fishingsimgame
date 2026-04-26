@@ -1,15 +1,22 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 
 public class FishingRodController : MonoBehaviour
 {
+
+    public static FishingRodController Instance { get; set; }
+
     public bool isWater;
+    public bool isCasting; // забрасывается
     public bool isCasted; // заброшена
     public bool isPulling; // вытягивается
 
     Animator animator;
+    private InputManager inputManager;
     public GameObject bait;
     public GameObject startOfRod;
     public GameObject ropeStart;
@@ -17,7 +24,7 @@ public class FishingRodController : MonoBehaviour
     public LineRenderer Rope;
 
 
-    public bool isAnimatorNull;
+    private RaycastHit hit;
 
 
     Transform baitPosition;
@@ -25,7 +32,16 @@ public class FishingRodController : MonoBehaviour
 
     private void Awake()
     {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
         animator = GetComponent<Animator>();
+        inputManager = InputManager.Instance;
         FishingMiniGame.OnFishingEnd += ReturnRod;
     }
 
@@ -34,29 +50,63 @@ public class FishingRodController : MonoBehaviour
         FishingMiniGame.OnFishingEnd -= ReturnRod;
     }
 
-    private void Update()
+    private void OnEnable()
+    {
+        if (inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.CastAFishingRod.performed += OnCastPerformed;
+        }
+        if (inputManager?.actions?.Fishing != null)
+        {
+            inputManager.actions.Fishing.Pull.performed += OnPullPerformed;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputManager?.actions?.Player != null)
+        {
+            inputManager.actions.Player.CastAFishingRod.performed -= OnCastPerformed;
+        }
+        if (inputManager?.actions?.Fishing != null)
+        {
+            inputManager.actions.Fishing.Pull.performed -= OnPullPerformed;
+        }
+    }
+
+    private void OnCastPerformed(InputAction.CallbackContext ctx)
     {
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
-        RaycastHit hit;
+        if (WaterCheck(ray) && !isCasted && !isPulling)
+        {
+            Vector3 point = new Vector3(hit.point.x, 7f, hit.point.z);
+            StartCoroutine(CastRod(point));
+        }
+    }
+    private void OnPullPerformed(InputAction.CallbackContext ctx)
+    {
+        if (isCasted && FishingMiniGame.Instance.isThereABite)
+        {
+            PullRod();
+        }
+    }
+
+    private bool WaterCheck(Ray ray)
+    {
+        
         if (Physics.Raycast(ray, out hit, Mathf.Infinity))
         {
             if (hit.collider.CompareTag("Water"))
             {
-                isWater = true;
-                if (Input.GetMouseButtonDown(0) && !isCasted && !isPulling)
-                {
-                    Vector3 point = new Vector3(hit.point.x, 7f, hit.point.z);
-                    StartCoroutine(CastRod(point));
-
-                }
+                return true;
             }
-            else
-                isWater = false;
         }
-        else
-            isWater = false;
+        return false;
+    }
 
+    private void Update()
+    {
         if (isCasted || isPulling)
         {
             if (ropeStart != null && startOfRod != null && ropeEnd != null)
@@ -67,15 +117,6 @@ public class FishingRodController : MonoBehaviour
                     ropeEnd.transform.position = baitPosition.position;
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Space) && !isPulling)
-            {
-                ReturnRod();
-            }
-        }
-
-        if (isCasted && Input.GetMouseButtonDown(1) && FishingMiniGame.Instance.isThereABite)
-        { 
-            PullRod();
         }
 
     }
@@ -107,13 +148,16 @@ public class FishingRodController : MonoBehaviour
         FishingMiniGame.Instance.setHasPulled();
     }
 
+    // не доделана
     public void ReturnRod()
     {
+
         Rope.enabled = false;
-        isCasted = false;
-        isPulling = false;
         Destroy(instantiatedBait);
 
         animator.SetTrigger(isCasted == true ? "Cancel" : "Cancel2");
+        isCasted = false;
+        isPulling = false;
+
     }
 }
