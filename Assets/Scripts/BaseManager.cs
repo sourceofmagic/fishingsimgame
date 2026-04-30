@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+using Unity.VisualScripting;
 
 public class BaseManager : MonoBehaviour
 {
@@ -8,37 +10,92 @@ public class BaseManager : MonoBehaviour
     public GameObject totalStats;
     public GameObject upgradeTree;
 
-    public bool isBestiaryActive = false;
-    public bool isLastStatsActive = true;
-    public bool isTotalStatsActive = false;
-    public bool isUpgradeTreeActive = false;
+    public GameObject bestiaryText;
+    public GameObject lastStatsText;
+    public GameObject totalStatsText;
+    public GameObject upgradeTreeText;
 
-    public void ChangeBestiaryVisibility()
+    public enum WindowType { Bestiary, LastStats, TotalStats, UpgradeTree, Nothing };
+    public WindowType currentWindow;
+
+    private void Start()
     {
-        isBestiaryActive = !isBestiaryActive;
-        bestiary.SetActive(isBestiaryActive);
+        OpenLastStats();
+        CalculateLastStats();
     }
 
-    public void ChangeLastStatsVisibility()
+    public void ChangeWindow(WindowType windowType)
     {
-        isLastStatsActive = !isLastStatsActive;
-        lastStats.SetActive(isLastStatsActive);
+        if (currentWindow == windowType) return;
+        currentWindow = windowType;
+
+        switch (windowType)
+        {
+            case WindowType.Bestiary:
+                currentWindow = WindowType.Bestiary;
+                bestiary.SetActive(true);
+                lastStats.SetActive(false);
+                totalStats.SetActive(false);
+                upgradeTree.SetActive(false);
+                break;
+            case WindowType.LastStats:
+                currentWindow = WindowType.LastStats;
+                lastStats.SetActive(true);
+                bestiary.SetActive(false);
+                totalStats.SetActive(false);
+                upgradeTree.SetActive(false);
+                break;
+            case WindowType.TotalStats:
+                currentWindow = WindowType.TotalStats;
+                totalStats.SetActive(true);
+                bestiary.SetActive(false);
+                lastStats.SetActive(false);
+                upgradeTree.SetActive(false);
+                break;
+            case WindowType.UpgradeTree:
+                currentWindow = WindowType.UpgradeTree;
+                upgradeTree.SetActive(true);
+                bestiary.SetActive(false);
+                lastStats.SetActive(false);
+                totalStats.SetActive(false);
+                break;
+        }
     }
 
-    public void ChangeTotalStatsVisibility()
+    public void OpenBestiary()
     {
-        isTotalStatsActive = !isTotalStatsActive;
-        totalStats.SetActive(isTotalStatsActive);
+        ChangeWindow(WindowType.Bestiary);
     }
 
-    public void ChangeUpgradeTreeVisibility()
+    public void OpenLastStats()
     {
-        isUpgradeTreeActive = !isUpgradeTreeActive;
-        upgradeTree.SetActive(isUpgradeTreeActive);
+        
+        ChangeWindow(WindowType.LastStats);
+    }
+
+    public void OpenTotalStats()
+    {
+        ChangeWindow(WindowType.TotalStats);
+    }
+
+    public void OpenUpgradeTree()
+    {
+        ChangeWindow(WindowType.UpgradeTree);
+    }
+
+    public void CalculateLastStats()
+    {
+        lastStatsText.GetComponent<TextMeshProUGUI>().text = $"Рыб поймано: {GameManager.Instance.getFishAmount(GameManager.Instance.currentFishingResult)}" +
+            $"\nТоплива потрачено: {GameManager.Instance.boatFuelTankVolume * 100}" +
+            $"\nМонет получено: {GameManager.Instance.coins}" +
+            $"\nНовых рыб найдено:{0}" +
+            $"\nВремя в забеге: {0}";
     }
 
     public void StartGame()
     {
+        GameManager.Instance.currentFishingResult.Clear();
+        Debug.Log("Очищен временный словарь");
         SceneManager.LoadScene("planet1");
 
         Cursor.visible = false;

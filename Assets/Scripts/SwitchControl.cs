@@ -129,6 +129,6 @@ public class SwitchControl : MonoBehaviour
 
     public void setFishCountText()
     {
-        textBox.GetComponent<TextMeshProUGUI>().text = "Рыб поймано: " + GameManager.Instance.getCurrentFishAmount();
+        textBox.GetComponent<TextMeshProUGUI>().text = "Рыб поймано: " + GameManager.Instance.getFishAmount(GameManager.Instance.currentFishingResult);
     }
 }

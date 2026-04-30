@@ -19,6 +19,7 @@ public class MainMenu : MonoBehaviour
         {
             inputManager.actions.UI.ToPause.performed += OnPausePerformed;
         }
+        ProgressBar.OnFuelExpiration += EndRun;
     }
 
     private void OnDisable()
@@ -27,6 +28,7 @@ public class MainMenu : MonoBehaviour
         {
             inputManager.actions.UI.ToPause.performed -= OnPausePerformed;
         }
+        ProgressBar.OnFuelExpiration -= EndRun;
     }
 
     private void OnPausePerformed(InputAction.CallbackContext ctx)
@@ -61,6 +63,8 @@ public class MainMenu : MonoBehaviour
         Cursor.visible = true;
         Time.timeScale = 1f;
         inputManager?.ChangeInputMap(InputManager.InputType.UI);
+
+        GameManager.Instance.currentFishingResult.Clear();
     }
 
     public void ReturnTOGame()
@@ -75,6 +79,13 @@ public class MainMenu : MonoBehaviour
             inputManager?.ChangeInputMap(InputManager.Instance.lastMap);
         }
         
+    }
+
+    public void EndRun()
+    {
+        SceneManager.LoadScene("Base");
+        Cursor.visible = true;
+        inputManager?.ChangeInputMap(InputManager.InputType.UI);
     }
 
     public void ExitGame()

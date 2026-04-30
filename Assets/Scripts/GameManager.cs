@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -7,13 +9,12 @@ public class GameManager : MonoBehaviour
 
     public List<FishData> fishList;
 
-    public int fishCountTest;
 
-    private Dictionary<FishData, int> currentFishingResult;
-    private Dictionary<FishData, int> fishDictionary;
-    [SerializeField] private int boatFuelTankVolume = 100;
-    [SerializeField] private int fuelConsumption = 20;
-    [SerializeField] private int coins;
+    public Dictionary<FishData, int> currentFishingResult;
+    public Dictionary<FishData, int> fishDictionary;
+    public float boatFuelTankVolume = 1.0f;
+    public float fuelConsumption = 0.25f;
+    public int coins = 0;
 
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -46,6 +47,8 @@ public class GameManager : MonoBehaviour
                 fishDictionary[fish] = 0;
             }
         }
+
+        ProgressBar.OnFuelExpiration += ApplyResultsOfFishing;
     }
 
     // инициализация списка
@@ -71,8 +74,6 @@ public class GameManager : MonoBehaviour
             currentFishingResult[fishdata] = 1;
         }
 
-        fishCountTest = getCurrentFishAmount();
-
     }
 
     // Принимаем результаты заплыва в общий счётчик
@@ -80,9 +81,19 @@ public class GameManager : MonoBehaviour
     {
         foreach(KeyValuePair<FishData, int> fish in currentFishingResult)
         {
+            // считаем монетки
+            if (fish.Key.fishName == "Ничего")
+                coins += 0;
+            else if (fish.Key.probability == 25)
+                coins += 1;
+            else if (fish.Key.probability > 1)
+                coins += 3;
+            else
+                coins += 100;
+
+            // заносим в общий счётчик
             fishDictionary[fish.Key] += fish.Value;
         }
-        currentFishingResult.Clear();
     }
 
     // Для прокачки траты топлива
@@ -104,20 +115,11 @@ public class GameManager : MonoBehaviour
     }
 
     // количество вылова за текущий забег
-    public int getCurrentFishAmount()
+    public int getFishAmount(Dictionary<FishData, int> dict)
     {
         int count = 0;
-        if (currentFishingResult != null)
+        if (dict != null)
             foreach (KeyValuePair<FishData, int> fish in currentFishingResult)
-                count += fish.Value;
-        return count;
-    }
-
-    public int getTotalFishAmount()
-    {
-        int count = 0;
-        if (fishDictionary != null)
-            foreach (KeyValuePair<FishData, int> fish in fishDictionary)
                 count += fish.Value;
         return count;
     }
