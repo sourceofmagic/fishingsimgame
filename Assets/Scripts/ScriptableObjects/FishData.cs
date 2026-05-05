@@ -6,4 +6,5 @@ public class FishData : ScriptableObject
     public string fishName;
     public Sprite inventoryItem;
     public int probability;
+    public string description;
 }

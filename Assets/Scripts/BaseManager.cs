@@ -1,25 +1,27 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
-using Unity.VisualScripting;
 
 public class BaseManager : MonoBehaviour
 {
+
+    public InputManager inputManager;
+
     public GameObject bestiary;
     public GameObject lastStats;
     public GameObject totalStats;
     public GameObject upgradeTree;
 
-    public GameObject bestiaryText;
-    public GameObject lastStatsText;
-    public GameObject totalStatsText;
-    public GameObject upgradeTreeText;
+    public TextMeshProUGUI lastStatsText;
+
 
     public enum WindowType { Bestiary, LastStats, TotalStats, UpgradeTree, Nothing };
     public WindowType currentWindow;
 
+
     private void Start()
     {
+        inputManager = InputManager.Instance;
         OpenLastStats();
         CalculateLastStats();
     }
@@ -85,17 +87,17 @@ public class BaseManager : MonoBehaviour
 
     public void CalculateLastStats()
     {
-        lastStatsText.GetComponent<TextMeshProUGUI>().text = $"Рыб поймано: {GameManager.Instance.getFishAmount(GameManager.Instance.currentFishingResult)}" +
+        lastStatsText.text = $"Рыб поймано: {GameManager.Instance.getFishAmount(GameManager.Instance.currentFishingResult)}" +
             $"\nТоплива потрачено: {GameManager.Instance.boatFuelTankVolume * 100}" +
-            $"\nМонет получено: {GameManager.Instance.coins}" +
-            $"\nНовых рыб найдено:{0}" +
+            $"\nМонет получено: {GameManager.Instance.newCoins}" +
+            $"\nНовых рыб найдено:{GameManager.Instance.newFishEncountered.Count}" +
             $"\nВремя в забеге: {0}";
     }
 
     public void StartGame()
     {
-        GameManager.Instance.currentFishingResult.Clear();
-        Debug.Log("Очищен временный словарь");
+        GameManager.Instance.StartNewSwim();
+
         SceneManager.LoadScene("planet1");
 
         Cursor.visible = false;

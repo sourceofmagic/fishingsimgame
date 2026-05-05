@@ -9,6 +9,9 @@ public class ProgressBar : MonoBehaviour
 
     public static event Action OnFuelExpiration;
 
+    private float startTime;
+    private float finishTime;
+
     private void Start()
     {
         fuel = gameObject.GetComponent<Image>();
@@ -16,6 +19,7 @@ public class ProgressBar : MonoBehaviour
         {
             Debug.LogError("Image should be type Filled");
         }
+        startTime = Time.realtimeSinceStartup;
     }
 
     private void OnEnable()
@@ -40,6 +44,10 @@ public class ProgressBar : MonoBehaviour
             fuel.fillAmount -= speed;
 
         if (fuel.fillAmount == 0)
+        { 
             OnFuelExpiration?.Invoke();
+            finishTime = Time.realtimeSinceStartup;
+            GameManager.Instance.timeInSwim = finishTime - startTime;
+        }
     }
 }

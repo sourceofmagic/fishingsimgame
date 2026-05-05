@@ -15,3 +15,4 @@ MonoBehaviour:
   fishName: "\u041D\u0438\u0447\u0435\u0433\u043E"
   inventoryItem: {fileID: 21300000, guid: a4d2916265ffe834ba67d3a807c3b4bb, type: 3}
   probability: 15
+  description: "\u041C\u0443\u0441\u043E\u0440"

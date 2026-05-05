@@ -12,9 +12,27 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<FishData, int> currentFishingResult;
     public Dictionary<FishData, int> fishDictionary;
+    public List<FishData> newFishEncountered;
+
     public float boatFuelTankVolume = 1.0f;
     public float fuelConsumption = 0.25f;
-    public int coins = 0;
+    public int totalCoins = 0;
+    public int newCoins = 0;
+
+    public int swimCount = 0;
+
+    public float timeInSwim;
+    public float bestTimeInSwim;
+    public float totalTimeInSwim;
+
+    // upgrades
+    public List<bool> luck;
+    public List<bool> ship;
+    public List<bool> tools;
+
+    public List<int> luckPrices = new List<int> {10, 15, 50};
+    public List<int> shipPrices = new List<int> {5, 10, 15};
+    public List<int> toolsPrices = new List<int> {100, 200, 300};
 
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -37,6 +55,7 @@ public class GameManager : MonoBehaviour
         fishList = new List<FishData>();
         currentFishingResult = new Dictionary<FishData, int>();
         fishDictionary = new Dictionary<FishData, int>();
+        newFishEncountered = new List<FishData>();
 
         LoadAllFishData("FishData");
 
@@ -47,6 +66,10 @@ public class GameManager : MonoBehaviour
                 fishDictionary[fish] = 0;
             }
         }
+
+        luck = new List<bool> { false, false, false };
+        ship = new List<bool> { false, false, false };
+        tools = new List<bool> { false, false, false };
 
         ProgressBar.OnFuelExpiration += ApplyResultsOfFishing;
     }
@@ -79,21 +102,34 @@ public class GameManager : MonoBehaviour
     // Принимаем результаты заплыва в общий счётчик
     public void ApplyResultsOfFishing()
     {
-        foreach(KeyValuePair<FishData, int> fish in currentFishingResult)
+        newFishEncountered = new List<FishData>();
+
+        foreach (KeyValuePair<FishData, int> fish in currentFishingResult)
         {
             // считаем монетки
             if (fish.Key.fishName == "Ничего")
-                coins += 0;
+                newCoins += 0;
             else if (fish.Key.probability == 25)
-                coins += 1;
+                newCoins += 1;
             else if (fish.Key.probability > 1)
-                coins += 3;
+                newCoins += 3;
             else
-                coins += 100;
+                newCoins += 100;
 
             // заносим в общий счётчик
+            if (fishDictionary[fish.Key] == 0)
+                newFishEncountered.Add(fish.Key);
+
             fishDictionary[fish.Key] += fish.Value;
         }
+
+        if (timeInSwim < bestTimeInSwim)
+            bestTimeInSwim = timeInSwim;
+
+        totalTimeInSwim += timeInSwim;
+
+        totalCoins += newCoins;
+        swimCount++;
     }
 
     // Для прокачки траты топлива
@@ -114,13 +150,41 @@ public class GameManager : MonoBehaviour
         boatFuelTankVolume += x;
     }
 
-    // количество вылова за текущий забег
+    // количество вылова из словаря
     public int getFishAmount(Dictionary<FishData, int> dict)
     {
         int count = 0;
-        if (dict != null)
-            foreach (KeyValuePair<FishData, int> fish in currentFishingResult)
+        if (dict.Count > 0)
+            foreach (KeyValuePair<FishData, int> fish in dict)
                 count += fish.Value;
         return count;
+    }
+
+    // ЧИТЫ
+    public void AddManyFish()
+    {
+        foreach (FishData fish in fishList)
+            fishDictionary[fish] = 10;
+        totalCoins = 100000;
+        totalTimeInSwim = 100f;
+    }
+
+    // сброс всех счётчиков перед началом нового заплыва
+    public void StartNewSwim()
+    {
+        currentFishingResult.Clear();
+        timeInSwim = 0;
+        newFishEncountered.Clear();
+        newCoins = 0;
+
+    }
+
+    // Форматирование времени
+    public string FormatTime(float seconds)
+    {
+        int mins = Mathf.FloorToInt(seconds / 60);
+        int secs = Mathf.FloorToInt(seconds % 60);
+        int millis = Mathf.FloorToInt((seconds * 100) % 100);
+        return $"{mins:00}:{secs:00}:{millis:00}";
     }
 }
