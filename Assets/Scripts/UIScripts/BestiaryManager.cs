@@ -21,7 +21,7 @@ public class BestiaryManager : MonoBehaviour
     public void Start()
     {
         //вхрш!!
-        GameManager.Instance.AddManyFish();
+        //GameManager.Instance.AddManyFish();
 
         inputManager = InputManager.Instance;
         InitializeBestiary();
