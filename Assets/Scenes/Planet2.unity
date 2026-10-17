@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fecf789bcf7c08d46932aa7b950aaee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerrainGenerator
-  config: {fileID: 0}
+  config: {fileID: 11400000, guid: 5f62dcdfed7a21e42b19994d1c56ec67, type: 2}
   generateOnStart: 1
 --- !u!1 &1734940687
 GameObject:

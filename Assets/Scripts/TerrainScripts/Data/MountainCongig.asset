@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e92ce6816c32d6479c3c5ec1ea99fff, type: 3}
   m_Name: MountainCongig
   m_EditorClassIdentifier: Assembly-CSharp::TerrainGenerationConfig
-  seed: 777
+  seed: 1231312
   useRandomSeed: 0
-  invertHeight: 0
-  noiseScale: 5
-  heightMultiplier: 80
+  invertHeight: 1
+  noiseScale: 12
+  heightMultiplier: 44
   noiseOffset: {x: 100, y: 100}
+  octaves: 6
+  lacunarity: 1.72
+  persistence: 0.5
+  useFalloff: 0
+  falloffStrength: 1.23
+  falloffPower: 5.6

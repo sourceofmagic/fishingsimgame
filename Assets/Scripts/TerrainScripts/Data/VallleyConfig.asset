@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e92ce6816c32d6479c3c5ec1ea99fff, type: 3}
   m_Name: VallleyConfig
   m_EditorClassIdentifier: Assembly-CSharp::TerrainGenerationConfig
-  seed: 12345
+  seed: 778
   useRandomSeed: 0
-  invertHeight: 0
-  noiseScale: 20
-  heightMultiplier: 20
+  invertHeight: 1
+  noiseScale: 5
+  heightMultiplier: 80
   noiseOffset: {x: 100, y: 100}
+  octaves: 4
+  lacunarity: 2
+  persistence: 0.5
+  useFalloff: 0
+  falloffStrength: 1.5
+  falloffPower: 3
