@@ -11,6 +11,7 @@ public class BaseManager : MonoBehaviour
     public GameObject lastStats;
     public GameObject totalStats;
     public GameObject upgradeTree;
+    public GameObject canvas;
 
     public TextMeshProUGUI lastStatsText;
 
@@ -99,6 +100,14 @@ public class BaseManager : MonoBehaviour
         GameManager.Instance.StartNewSwim();
 
         SceneManager.LoadScene("planet1");
+
+        Cursor.visible = false;
+        InputManager.Instance?.ChangeInputMap(InputManager.InputType.Player);
+    }
+
+    public void ClosePanel()
+    {
+        canvas.SetActive(false);
 
         Cursor.visible = false;
         InputManager.Instance?.ChangeInputMap(InputManager.InputType.Player);
